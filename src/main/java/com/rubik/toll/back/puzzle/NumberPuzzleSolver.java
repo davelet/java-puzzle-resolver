@@ -1,148 +1,300 @@
 package com.rubik.toll.back.puzzle;
 
-import java.time.Duration;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Set;
-
+import java.util.LinkedList;
+import java.util.Queue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class NumberPuzzleSolver {
     private static final Logger logger = LogManager.getLogger(NumberPuzzleSolver.class);
-    private final int size;
-    private final Board board;
+    private int[][] board; // 棋盘状态
+    private int xsize, ysize; // 棋盘尺寸
+    private int[][] where; // 存储每个数字的位置
+    private boolean[][] readyFlag; // 标识已经排好的位置
+    private StringBuilder ansOp; // 记录移动操作
 
-    public NumberPuzzleSolver(Board initialBoard) {
-        if (initialBoard == null) {
-            throw new IllegalArgumentException("输入棋盘不能为空");
+    // 移动方向：右、左、上、下
+    private static final int[][] DIRECTIONS = { { 0, 1 }, { 0, -1 }, { -1, 0 }, { 1, 0 } };
+    private static final char[] DIRECTION_CHARS = { '右', '左', '上', '下' };
+
+    // 黄金操作序列
+    private static final int[] GOLD_OP = { 0, 2, 1, 3, 1, 2, 0, 0, 3, 1 };
+    private static final int[] GOLD_OP_VERTICAL;
+
+    static {
+        // 初始化垂直方向的黄金操作序列
+        GOLD_OP_VERTICAL = new int[GOLD_OP.length];
+        int[] rotateMap = { 3, 2, 0, 1 };
+        for (int i = 0; i < GOLD_OP.length; i++) {
+            GOLD_OP_VERTICAL[i] = rotateMap[GOLD_OP[i]];
         }
-        
-        int boardSize = initialBoard.getSize();
-        if (boardSize > PuzzleConstants.MAX_SIZE) {
-            throw new IllegalArgumentException("棋盘大小不能超过" + PuzzleConstants.MAX_SIZE);
-        } else if (boardSize < PuzzleConstants.MIN_SIZE) {
-            throw new IllegalArgumentException("棋盘大小不能小于" + PuzzleConstants.MIN_SIZE);
-        }
-        
-        this.size = boardSize;
-        this.board = initialBoard;
     }
 
-    // 主要解决方法
+    public NumberPuzzleSolver(Board board) {
+        if (board == null) {
+            throw new IllegalArgumentException("棋盘不能为空");
+        }
+        int size = board.getSize();
+        this.xsize = size;
+        this.ysize = size;
+
+        // 将一维数组转换为二维数组
+        int[] tiles = board.getTiles();
+        this.board = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                this.board[i][j] = tiles[i * size + j];
+            }
+        }
+
+        this.where = new int[size * size][2];
+        this.readyFlag = new boolean[size][size];
+        this.ansOp = new StringBuilder();
+        initPos();
+    }
+
+    private void initPos() {
+        for (int i = 0; i < xsize; i++) {
+            for (int j = 0; j < ysize; j++) {
+                int num = board[i][j];
+                where[num][0] = i;
+                where[num][1] = j;
+            }
+        }
+    }
+
+    private boolean isLegal(int x, int y) {
+        return x >= 0 && x < xsize && y >= 0 && y < ysize;
+    }
+
+    private void swapNeighbor(int[] src, int[] des) {
+        if (this.ansOp.length() > 10_0000) {
+            throw new RuntimeException("已经超过100000步尚未求解成功，终止");
+        }
+        if (board[src[0]][src[1]] == 0) {
+            int[] temp = src;
+            src = des;
+            des = temp;
+        }
+        ansOp.append(DIRECTION_CHARS[getDirection(des[0] - src[0], des[1] - src[1])]);
+
+        // 交换棋盘上的数字
+        int temp = board[src[0]][src[1]];
+        board[src[0]][src[1]] = board[des[0]][des[1]];
+        board[des[0]][des[1]] = temp;
+
+        // 更新位置信息
+        where[board[src[0]][src[1]]] = new int[] { src[0], src[1] };
+        where[board[des[0]][des[1]]] = new int[] { des[0], des[1] };
+    }
+
+    private int getDirection(int dx, int dy) {
+        for (int i = 0; i < DIRECTIONS.length; i++) {
+            if (DIRECTIONS[i][0] == dx && DIRECTIONS[i][1] == dy) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int[] whereIs(int x, int y) {
+        int target = x * ysize + y + 1;
+        if (target == xsize * ysize)
+            target = 0;
+        return where[target];
+    }
+
     public boolean solve() {
-        // 计算初始状态的逆序数
-        if (!isSolvable(board.getTiles(), size)) {
-            logger.info(board);
-            logger.info("当前输入无解");
+        // 记录开始时间
+        long startTime = System.currentTimeMillis();
+
+        // 打印初始状态
+        printBoard("初始棋盘状态：");
+
+        if (!isSolvable()) {
+            logger.info("unsolvable");
             return false;
         }
+        
+        boolean result = go();
 
-        logger.info("开始求解数字华容道...");
-        long startTime = System.nanoTime();
+        // 打印最终状态
+        printBoard("最终棋盘状态：");
 
-        PriorityQueue<State> openSet = new PriorityQueue<>();
-        Set<State> closedSet = new HashSet<>();
-        openSet.offer(new State(board, 0));
+        // 计算并打印执行时间
+        long endTime = System.currentTimeMillis();
+        logger.info("求解共{}步，耗时：{}毫秒", this.ansOp.length(), endTime - startTime);
+        logger.info(this.ansOp);
+        return result;
+    }
 
-        while (!openSet.isEmpty()) {
-            State currentState = openSet.poll();
-            logger.debug(currentState.getBoard());
-
-            if (currentState.isSolved()) {
-                Duration duration = Duration.ofNanos(System.nanoTime() - startTime);
-                logger.info("找到解决方案！总步数：{}", currentState.getMoves());
-                logger.info("求解用时：{}分{}秒{}毫秒\n",
-                        duration.toMinutesPart(),
-                        duration.toSecondsPart(),
-                        duration.toMillisPart());
-                return true;
+    private void printBoard(String prefix) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < xsize; i++) {
+            for (int j = 0; j < ysize; j++) {
+                if (board[i][j] == 0) {
+                    sb.append("   ");
+                } else {
+                    sb.append(String.format("%2d ", board[i][j]));
+                }
             }
+            sb.append("\n");
+        }
+        logger.info("{}\n{}", prefix, sb.toString());
+    }
 
-            // 检查当前状态的总步数是否超过限制
-            if (currentState.getMoves() + currentState.getManhattan() > 1000) {
-                Duration duration = Duration.ofNanos(System.nanoTime() - startTime);
-                logger.info("预计需要超过1000步才能解决，判定为无解");
-                logger.info("求解用时：{}分{}秒{}毫秒\n",
-                        duration.toMinutesPart(),
-                        duration.toSecondsPart(),
-                        duration.toMillisPart());
-                return false;
+    public String getAnswer() {
+        return ansOp.toString();
+    }
+
+    private boolean isSolvable() {
+        int[] flatBoard = new int[xsize * ysize];
+        int index = 0;
+        for (int i = 0; i < xsize; i++) {
+            for (int j = 0; j < ysize; j++) {
+                flatBoard[index++] = board[i][j];
             }
+        }
+        int reverse = getReverse(flatBoard);
+        if (ysize % 2 == 0) {
+            int[] space = whereIs(xsize - 1, ysize - 1);
+            reverse ^= (xsize - 1 - space[0]) & 1;
+        }
+        return reverse == 0;
+    }
 
-            closedSet.add(currentState);
-
-            for (State nextState : currentState.getNextStates()) {
-                if (!closedSet.contains(nextState) && !openSet.contains(nextState)) {
-                    openSet.offer(nextState);
-                    // 打印移动描述
-                    int movedNumber = printMove(currentState.getBoard().getTiles(), nextState.getBoard().getTiles());
-                    logger.debug("将{}与空位交换 （当前已移动{}步，估计共{}步）", movedNumber, nextState.getMoves(),
-                            nextState.getMoves() + nextState.getManhattan());
+    private int getReverse(int[] arr) {
+        int ans = 0;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != 0) {
+                for (int j = i + 1; j < arr.length; j++) {
+                    if (arr[j] != 0 && arr[i] > arr[j]) {
+                        ans ^= 1;
+                    }
                 }
             }
         }
-
-        Duration duration = Duration.ofNanos(System.nanoTime() - startTime);
-        logger.info("未找到解决方案");
-        logger.info("求解用时：{}分{}秒{}毫秒\n",
-                duration.toMinutesPart(),
-                duration.toSecondsPart(),
-                duration.toMillisPart());
-        return false;
+        return ans;
     }
 
-    // 打印移动描述
-    private int printMove(int[] oldBoard, int[] newBoard) {
-        // 找到新旧状态中空格的位置
-        int newEmpty = findEmptyPosition(newBoard);
-        // 获取移动的数字
-        int movedNumber = oldBoard[newEmpty];
-        return movedNumber;
-    }
-
-    // 查找空格位置的辅助方法
-    private int findEmptyPosition(int[] board) {
-        for (int i = 0; i < size * size; i++) {
-            if (board[i] == 0)
-                return i;
+    private int[][] getPath(int fx, int fy, int tx, int ty, Integer stillX, Integer stillY) {
+        int[][] distance = new int[xsize][ysize];
+        for (int i = 0; i < xsize; i++) {
+            for (int j = 0; j < ysize; j++) {
+                distance[i][j] = -1;
+            }
         }
-        throw new IllegalStateException("无法找到空格位置，数组状态异常"); // 抛出异常表示数组状态异常
+        Queue<int[]> q = new LinkedList<>();
+        q.offer(new int[] { fx, fy });
+        distance[fx][fy] = 0;
+        int[][][] lastPos = new int[xsize][ysize][2];
+
+        while (!q.isEmpty()) {
+            int[] now = q.poll();
+            for (int[] dir : DIRECTIONS) {
+                int xx = now[0] + dir[0];
+                int yy = now[1] + dir[1];
+                if (isLegal(xx, yy)
+                        && distance[xx][yy] == -1
+                        && (stillX == null || stillY == null || xx != stillX || yy != stillY)
+                        && !readyFlag[xx][yy]) {
+                    q.offer(new int[] { xx, yy });
+                    distance[xx][yy] = distance[now[0]][now[1]] + 1;
+                    lastPos[xx][yy] = now;
+                    if (xx == tx && yy == ty) {
+                        LinkedList<int[]> path = new LinkedList<>();
+                        int[] curr = new int[] { xx, yy };
+                        while (true) {
+                            path.addFirst(curr);
+                            if (curr[0] == fx && curr[1] == fy)
+                                break;
+                            curr = lastPos[curr[0]][curr[1]];
+                        }
+                        return path.toArray(new int[0][]);
+                    }
+                }
+            }
+        }
+        return new int[0][];
     }
 
-    // 计算逆序数并判断是否有解
-    private boolean isSolvable(int[] board, int board_width) {
-        // 计算不包含空格的数字的逆序数
-        int inversions = 0;
-        for (int i = 0; i < board.length - 1; i++) {
-            if (board[i] == 0)
+    private void moveSpaceTo(int x, int y, Integer stillX, Integer stillY) {
+        int[] space = whereIs(xsize - 1, ysize - 1);
+        int[][] path = getPath(space[0], space[1], x, y, stillX, stillY);
+        for (int i = 1; i < path.length; i++) {
+            swapNeighbor(path[i], path[i - 1]);
+        }
+    }
+
+    private void move(int srcX, int srcY, int desX, int desY) {
+        int[][] path = getPath(srcX, srcY, desX, desY, null, null);
+        for (int i = 1; i < path.length; i++) {
+            moveSpaceTo(path[i][0], path[i][1], path[i - 1][0], path[i - 1][1]);
+            swapNeighbor(path[i], path[i - 1]);
+        }
+    }
+
+    private void doOp(int[] opList) {
+        int[] space = whereIs(xsize - 1, ysize - 1);
+        for (int i : opList) {
+            int x = space[0] - DIRECTIONS[i][0];
+            int y = space[1] - DIRECTIONS[i][1];
+            swapNeighbor(new int[] { x, y }, space);
+            space = new int[] { x, y };
+        }
+    }
+
+    private boolean go() {
+        // 左上部分：xsize-2行，ysize-2列
+        for (int i = 0; i < xsize - 2; i++) {
+            for (int j = 0; j < ysize - 2; j++) {
+                int[] pos = whereIs(i, j);
+                move(pos[0], pos[1], i, j);
+                readyFlag[i][j] = true;
+            }
+        }
+
+        // 最后两行
+        for (int i = 0; i < ysize - 2; i++) {
+            int[] pos = whereIs(xsize - 1, i);
+            move(pos[0], pos[1], xsize - 1, i);
+            int[] space = whereIs(xsize - 1, ysize - 1);
+            if (space[0] == xsize - 2 && space[1] == i) {
+                swapNeighbor(new int[] { xsize - 2, i }, new int[] { xsize - 2, i + 1 });
+            }
+            pos = whereIs(xsize - 2, i);
+            if (pos[0] == xsize - 2 && pos[1] == i)
                 continue;
-            for (int j = i + 1; j < board.length; j++) {
-                if (board[j] != 0 && board[i] > board[j]) {
-                    inversions++;
-                }
+            pos = whereIs(xsize - 2, i);
+            move(pos[0], pos[1], xsize - 2, i + 2);
+            moveSpaceTo(xsize - 2, i + 1, xsize - 2, i + 2);
+            doOp(GOLD_OP);
+        }
+
+        // 最后两列
+        for (int i = 0; i < xsize - 2; i++) {
+            int[] pos = whereIs(i, ysize - 2);
+            move(pos[0], pos[1], i, ysize - 2);
+            int[] space = whereIs(xsize - 1, ysize - 1);
+            if (space[0] == i && space[1] == ysize - 1) {
+                swapNeighbor(new int[] { i, ysize - 1 }, new int[] { i + 1, ysize - 1 });
             }
+            pos = whereIs(i, ysize - 1);
+            if (pos[0] == i && pos[1] == ysize - 1)
+                continue;
+            pos = whereIs(i, ysize - 1);
+            move(pos[0], pos[1], i + 2, ysize - 1);
+            moveSpaceTo(i + 1, ysize - 1, i + 2, ysize - 1);
+            doOp(GOLD_OP_VERTICAL);
         }
 
-        // 获取空格所在行数（从顶部数起，0-based）
-        int emptyRow = 0;
-        for (int i = 0; i < board.length; i++) {
-            if (board[i] == 0) {
-                emptyRow = i / board_width;
-                break;
-            }
-        }
-
-        // 对于3x3的8数码问题（奇数大小）：
-        // - 只需要考虑逆序数的奇偶性
-        // - 逆序数为偶数时有解
-        if (board_width % 2 == 1) {
-            return inversions % 2 == 0;
-        }
-
-        // 对于偶数大小的情况：
-        // - 从顶部数起，空格在偶数行时，逆序数为奇数有解
-        // - 从顶部数起，空格在奇数行时，逆序数为偶数有解
-        return (emptyRow + inversions) % 2 == 1;
+        // 最后的2x2小正方形
+        int[] pos = whereIs(xsize - 2, ysize - 2);
+        move(pos[0], pos[1], xsize - 2, ysize - 2);
+        pos = whereIs(xsize - 2, ysize - 1);
+        move(pos[0], pos[1], xsize - 2, ysize - 1);
+        pos = whereIs(xsize - 1, ysize - 2);
+        move(pos[0], pos[1], xsize - 1, ysize - 2);
+        return true;
     }
 }

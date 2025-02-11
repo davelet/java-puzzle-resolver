@@ -7,14 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 public class NumberPuzzleSolverTest {
-    @Test
-    void testInvalidSize() {
-        // 测试1x1的情况
-        assertThrows(IllegalArgumentException.class, () -> new Board(1));
-        
-        // 测试21x21的情况
-        assertThrows(IllegalArgumentException.class, () -> new Board(21));
-    }
 
     @Test
     void test2x2Puzzle() {
@@ -70,5 +62,25 @@ public class NumberPuzzleSolverTest {
         Board board = new Board(tiles);
         NumberPuzzleSolver solver = new NumberPuzzleSolver(board);
         assertFalse(solver.solve(), "无解情况应该返回false");
+    }
+
+    @Test
+    void test11x11Puzzle() {
+        int[] tiles = {
+            2, 4, 13, 14, 27, 5, 18, 19, 8, 10, 11,
+            51, 3, 23, 49, 16, 20, 6, 7, 28, 21, 22,
+            1, 15, 25, 26, 38, 37, 17, 41, 29, 52, 32,
+            35, 24, 48, 58, 61, 39, 42, 30, 43, 31, 33,
+            12, 47, 34, 46, 72, 81, 53, 54, 9, 66, 55,
+            114, 45, 57, 36, 59, 60, 63, 40, 64, 77, 44,
+            78, 68, 92, 69, 67, 79, 86, 97, 76, 84, 65,
+            90, 101, 115, 70, 95, 94, 50, 73, 108, 88, 99,
+            56, 89, 0, 96, 71, 91, 62, 74, 118, 85, 87,
+            112, 100, 80, 93, 82, 116, 75, 106, 98, 119, 120,
+            111, 103, 104, 102, 83, 113, 105, 107, 110, 117, 109
+        };
+        Board board = new Board(tiles);
+        NumberPuzzleSolver solver = new NumberPuzzleSolver(board);
+        assertTrue(solver.solve(), "11x11方阵应该可以求解");
     }
 }

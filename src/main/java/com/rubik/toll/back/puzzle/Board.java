@@ -8,8 +8,8 @@ public class Board implements Cloneable {
     private int emptyPosition;
 
     public Board(int size) {
-        if (size < PuzzleConstants.MIN_SIZE || size > PuzzleConstants.MAX_SIZE) {
-            throw new IllegalArgumentException("棋盘大小必须在2到10之间");
+        if (size < 2) {
+            throw new IllegalArgumentException("棋盘最少宽2");
         }
         this.size = size;
         this.tiles = new int[size * size];
@@ -17,14 +17,16 @@ public class Board implements Cloneable {
     }
 
     public Board(int[] tiles) {
-        for (int i = PuzzleConstants.MIN_SIZE; i <= PuzzleConstants.MAX_SIZE; i++) {
+        for (int i = 2; i <= 30; i++) {
             if (tiles.length == i * i) {
                 this.size = i;
                 break;
+            } else if (tiles.length < i * i) {
+                throw new IllegalArgumentException("输入棋盘无效");
             }
         }
         if (this.size == 0) {
-            throw new IllegalArgumentException("输入棋盘大小无效");
+            throw new IllegalArgumentException("输入棋盘无效");
         }
         this.tiles = tiles;
         if (!isValidInput(tiles)) {

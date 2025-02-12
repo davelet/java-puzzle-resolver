@@ -65,6 +65,22 @@ public class NumberPuzzleSolverTest {
     }
 
     @Test
+    void test6x6Puzzle() {
+        int[][] tiles2D = {
+            {7, 2, 3, 4, 6, 5},
+            {14, 1, 8, 9, 12, 10},
+            {13, 27, 23, 21, 18, 24},
+            {15, 0, 31, 22, 34, 35},
+            {20, 25, 19, 28, 29, 16},
+            {26, 33, 32, 17, 30, 11}
+        };
+        
+        Board board = new Board(tiles2D);
+        NumberPuzzleSolver solver = new NumberPuzzleSolver(board);
+        assertTrue(solver.solve(), "6x6方阵应该可以求解");
+    }
+
+    @Test
     void test11x11Puzzle() {
         int[] tiles = {
             2, 4, 13, 14, 27, 5, 18, 19, 8, 10, 11,

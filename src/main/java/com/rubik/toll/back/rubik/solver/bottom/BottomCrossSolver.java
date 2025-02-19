@@ -245,26 +245,6 @@ public class BottomCrossSolver extends LayerSolver {
         };
     }
 
-    private Face getLeftSide(Face face) {
-        return switch (face) {
-            case FRONT -> Face.LEFT;
-            case RIGHT -> Face.FRONT;
-            case BACK -> Face.RIGHT;
-            case LEFT -> Face.BACK;
-            default -> throw new IllegalArgumentException("无效的面");
-        };
-    }
-
-    private Face getRightSide(Face face) {
-        return switch (face) {
-            case FRONT -> Face.RIGHT;
-            case RIGHT -> Face.BACK;
-            case BACK -> Face.LEFT;
-            case LEFT -> Face.FRONT;
-            default -> throw new IllegalArgumentException("无效的面");
-        };
-    }
-
     protected boolean isSolved() {
         // 检查底面十字是否为白色
         if (cube.getColor(Face.DOWN, 0, 1) != Color.WHITE ||

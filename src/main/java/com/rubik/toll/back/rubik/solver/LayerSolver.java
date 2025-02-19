@@ -46,4 +46,24 @@ public abstract class LayerSolver {
     protected void rotateFace(Face face, boolean clockwise) {
         cubeShuffler.rotateFace(face, TwistDirection.of(clockwise));
     }
+
+    protected Face getLeftSide(Face face) {
+        return switch (face) {
+            case FRONT -> Face.LEFT;
+            case RIGHT -> Face.FRONT;
+            case BACK -> Face.RIGHT;
+            case LEFT -> Face.BACK;
+            default -> throw new IllegalArgumentException("无效的面");
+        };
+    }
+
+    protected Face getRightSide(Face face) {
+        return switch (face) {
+            case FRONT -> Face.RIGHT;
+            case RIGHT -> Face.BACK;
+            case BACK -> Face.LEFT;
+            case LEFT -> Face.FRONT;
+            default -> throw new IllegalArgumentException("无效的面");
+        };
+    }
 }

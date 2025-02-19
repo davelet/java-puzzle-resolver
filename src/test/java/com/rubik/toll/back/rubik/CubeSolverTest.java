@@ -1,5 +1,6 @@
 package com.rubik.toll.back.rubik;
 
+import com.rubik.toll.back.rubik.solver.MiddleLayerSolver;
 import com.rubik.toll.back.rubik.solver.bottom.BottomCrossSolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,8 +52,8 @@ class CubeSolverTest {
         cubeShuffler.shuffle(20);
         // 执行测试
         cubeSolver.solve();
-        BottomCrossSolver bottomCrossSolver = new BottomCrossSolver(cube);
-        bottomCrossSolver.solve();
+//        MiddleLayerSolver bottomCrossSolver = new MiddleLayerSolver(cube);
+//        bottomCrossSolver.solve();
         // 验证结果
 //        assertTrue(cube.isSolved());
     }

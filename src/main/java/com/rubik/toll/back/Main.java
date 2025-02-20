@@ -1,12 +1,13 @@
 package com.rubik.toll.back;
 
+import com.rubik.toll.back.rubik.cube.Face;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.rubik.toll.back.puzzle.Board;
 import com.rubik.toll.back.puzzle.NumberPuzzleSolver;
 import com.rubik.toll.back.puzzle.PuzzleShuffler;
-import com.rubik.toll.back.rubik.Cube;
+import com.rubik.toll.back.rubik.cube.Cube;
 import com.rubik.toll.back.rubik.CubeShuffler;
 import com.rubik.toll.back.rubik.TwistDirection;
 
@@ -25,7 +26,7 @@ public class Main {
 
         Cube cube = new Cube();
        CubeShuffler cs = new CubeShuffler(cube);
-       cs.rotateFace(com.rubik.toll.back.rubik.Face.RIGHT, TwistDirection.CLOCKWISE);
+       cs.rotateFace(Face.RIGHT, TwistDirection.CLOCKWISE);
         // cube.shuffle(2);
         logger.info("扭转后的状态 - {}", cube);
         cube.solve();

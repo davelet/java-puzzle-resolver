@@ -1,13 +1,15 @@
 package com.rubik.toll.back.rubik.solver;
 
-import com.rubik.toll.back.rubik.Cube;
+import com.rubik.toll.back.rubik.cube.Color;
+import com.rubik.toll.back.rubik.cube.Cube;
 import com.rubik.toll.back.rubik.CubeShuffler;
-import com.rubik.toll.back.rubik.Face;
+import com.rubik.toll.back.rubik.cube.Face;
 import com.rubik.toll.back.rubik.TwistDirection;
 
 public abstract class LayerSolver {
     protected final Cube cube;
     private final CubeShuffler cubeShuffler;
+    protected static final Color yellow = Face.UP.getColor();
 
     protected LayerSolver(Cube cube) {
         if (cube == null) {

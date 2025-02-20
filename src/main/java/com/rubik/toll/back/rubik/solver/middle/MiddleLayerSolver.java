@@ -1,9 +1,12 @@
-package com.rubik.toll.back.rubik.solver;
+package com.rubik.toll.back.rubik.solver.middle;
 
-import com.rubik.toll.back.rubik.Cube;
-import com.rubik.toll.back.rubik.Face;
-import com.rubik.toll.back.rubik.Color;
+import com.rubik.toll.back.rubik.cube.Cube;
+import com.rubik.toll.back.rubik.cube.Face;
+import com.rubik.toll.back.rubik.cube.Color;
+import com.rubik.toll.back.rubik.solver.LayerSolver;
 import com.rubik.toll.back.rubik.solver.bottom.BottomCornerSolver;
+import com.rubik.toll.back.rubik.solver.top.TopCrossSolver;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -163,6 +166,6 @@ public class MiddleLayerSolver extends LayerSolver {
 
     @Override
     public LayerSolver getNextSolver() {
-        return new TopLayerSolver(cube);
+        return new TopCrossSolver(cube);
     }
 }

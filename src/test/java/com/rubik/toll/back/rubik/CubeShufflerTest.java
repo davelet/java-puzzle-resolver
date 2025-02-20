@@ -1,5 +1,8 @@
 package com.rubik.toll.back.rubik;
 
+import com.rubik.toll.back.rubik.cube.Color;
+import com.rubik.toll.back.rubik.cube.Cube;
+import com.rubik.toll.back.rubik.cube.Face;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

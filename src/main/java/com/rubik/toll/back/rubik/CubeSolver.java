@@ -1,5 +1,6 @@
 package com.rubik.toll.back.rubik;
 
+import com.rubik.toll.back.rubik.cube.Cube;
 import com.rubik.toll.back.rubik.solver.bottom.*;
 import com.rubik.toll.back.rubik.solver.*;
 import org.apache.logging.log4j.LogManager;

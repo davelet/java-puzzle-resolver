@@ -1,4 +1,6 @@
-package com.rubik.toll.back.rubik;
+package com.rubik.toll.back.rubik.cube;
+
+import com.rubik.toll.back.rubik.CubeSolver;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +11,7 @@ import java.util.Set;
 public class Cube implements Cloneable {
     private final Color[][][] state;
     private static final int SIZE = 3;
+    private static final String SYMBOL = "〇";
 
     public Cube() {
         state = new Color[6][SIZE][SIZE];
@@ -191,58 +194,93 @@ public class Cube implements Cloneable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("\n");
-
+    
         // 第一行：上面和后面的名称
         sb.append("      ").append(Face.UP.getDescription()).append("        ")
           .append(Face.BACK.getDescription()).append("（镜像）").append("\n");
-
+    
         // 第2-4行：上面和后面的颜色
+        Color upCenterColor = state[Face.UP.ordinal()][1][1];
+        Color backCenterColor = state[Face.BACK.ordinal()][1][1];
         for (int i = 0; i < SIZE; i++) {
             sb.append("      ");
             // 上面
             for (int j = 0; j < SIZE; j++) {
-                sb.append(state[Face.UP.ordinal()][i][j].getColorChar()).append(" ");
+                if (i == 1 && j == 1) {
+                    sb.append(upCenterColor.getColorChar()).append(" ");
+                } else {
+                    Color color = state[Face.UP.ordinal()][i][j];
+                    sb.append(color == upCenterColor ? SYMBOL : color.getColorChar()).append(" ");
+                }
             }
             sb.append("    ");
             // 后面（镜像）
             for (int j = SIZE - 1; j >= 0; j--) {
-                sb.append(state[Face.BACK.ordinal()][i][j].getColorChar()).append(" ");
+                if (i == 1 && j == 1) {
+                    sb.append(backCenterColor.getColorChar()).append(" ");
+                } else {
+                    Color color = state[Face.BACK.ordinal()][i][j];
+                    sb.append(color == backCenterColor? SYMBOL : color.getColorChar()).append(" ");
+                }
             }
             sb.append("\n");
         }
         sb.append("\n");
-
+    
         // 中间三行：左、前、右面
+        Color leftCenterColor = state[Face.LEFT.ordinal()][1][1];
+        Color frontCenterColor = state[Face.FRONT.ordinal()][1][1];
+        Color rightCenterColor = state[Face.RIGHT.ordinal()][1][1];
         for (int i = 0; i < SIZE; i++) {
             // 左面
             String space = " ";
             for (int j = 0; j < SIZE; j++) {
-                sb.append(state[Face.LEFT.ordinal()][i][j].getColorChar()).append(space);
+                if (i == 1 && j == 1) {
+                    sb.append(leftCenterColor.getColorChar()).append(space);
+                } else {
+                    Color color = state[Face.LEFT.ordinal()][i][j];
+                    sb.append(color == leftCenterColor ? SYMBOL : color.getColorChar()).append(space);
+                }
             }
             sb.append(space.repeat(2));
             // 前面
             for (int j = 0; j < SIZE; j++) {
-                sb.append(state[Face.FRONT.ordinal()][i][j].getColorChar()).append(space);
+                if (i == 1 && j == 1) {
+                    sb.append(frontCenterColor.getColorChar()).append(space);
+                } else {
+                    Color color = state[Face.FRONT.ordinal()][i][j];
+                    sb.append(color == frontCenterColor? SYMBOL : color.getColorChar()).append(space);
+                }
             }
             sb.append(space.repeat(2));
             // 右面
             for (int j = 0; j < SIZE; j++) {
-                sb.append(state[Face.RIGHT.ordinal()][i][j].getColorChar()).append(space);
+                if (i == 1 && j == 1) {
+                    sb.append(rightCenterColor.getColorChar()).append(space);
+                } else {
+                    Color color = state[Face.RIGHT.ordinal()][i][j];
+                    sb.append(color == rightCenterColor? SYMBOL : color.getColorChar()).append(space);
+                }
             }
             sb.append("\n");
         }
         sb.append("\n");
-
+    
         // 最后三行：下面
-//        sb.append("      ").append(Face.DOWN.getDescription()).append("\n");
+        Color downCenterColor = state[Face.DOWN.ordinal()][1][1];
         for (int i = 0; i < SIZE; i++) {
             sb.append("      ");
             for (int j = 0; j < SIZE; j++) {
-                sb.append(state[Face.DOWN.ordinal()][i][j].getColorChar()).append(" ");
+                if (i == 1 && j == 1) {
+                    sb.append(downCenterColor.getColorChar()).append(" ");
+                    continue;
+                }
+                Color color = state[Face.DOWN.ordinal()][i][j];
+                sb.append(color == downCenterColor ? SYMBOL : color.getColorChar()).append(" ");
             }
             sb.append("\n");
         }
-
+    
         return sb.toString();
     }
 

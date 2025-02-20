@@ -1,4 +1,4 @@
-package com.rubik.toll.back.rubik;
+package com.rubik.toll.back.rubik.cube;
 
 public enum Color {
     WHITE("白"),

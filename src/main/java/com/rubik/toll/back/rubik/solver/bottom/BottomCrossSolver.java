@@ -1,8 +1,8 @@
 package com.rubik.toll.back.rubik.solver.bottom;
 
-import com.rubik.toll.back.rubik.Color;
-import com.rubik.toll.back.rubik.Cube;
-import com.rubik.toll.back.rubik.Face;
+import com.rubik.toll.back.rubik.cube.Color;
+import com.rubik.toll.back.rubik.cube.Cube;
+import com.rubik.toll.back.rubik.cube.Face;
 import com.rubik.toll.back.rubik.solver.LayerSolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

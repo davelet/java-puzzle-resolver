@@ -1,4 +1,4 @@
-package com.rubik.toll.back.rubik;
+package com.rubik.toll.back.rubik.cube;
 
 /**
  * 魔方六个面的标准颜色配置

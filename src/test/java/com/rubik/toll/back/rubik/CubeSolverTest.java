@@ -1,17 +1,13 @@
 package com.rubik.toll.back.rubik;
 
-import com.rubik.toll.back.rubik.solver.MiddleLayerSolver;
-import com.rubik.toll.back.rubik.solver.bottom.BottomCrossSolver;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.rubik.toll.back.rubik.cube.Cube;
+import com.rubik.toll.back.rubik.cube.Face;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CubeSolverTest {
-
-    private static final Logger log = LogManager.getLogger(CubeSolverTest.class);
     private Cube cube;
 
     private CubeSolver cubeSolver;
@@ -48,11 +44,14 @@ class CubeSolverTest {
 
     @Test
     void solve_ExecuteBottomCornerSolver() {
-        // 打乱魔方
-        cubeShuffler.shuffle(20);
-        // 执行测试
-        cubeSolver.solve();
-        // 验证结果
-        assertTrue(cube.isSolved());
+        for (int a = 0; a < 20; a++) {
+            System.out.println("第轮测试 " + a + "<UNK>");
+            // 打乱魔方
+            cubeShuffler.shuffle(20);
+            // 执行测试
+            cubeSolver.solve();
+            // 验证结果
+            assertTrue(cube.isSolved());
+        }
     }
 }

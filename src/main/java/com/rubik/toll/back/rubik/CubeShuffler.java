@@ -2,6 +2,9 @@ package com.rubik.toll.back.rubik;
 
 import java.util.Random;
 
+import com.rubik.toll.back.rubik.cube.Color;
+import com.rubik.toll.back.rubik.cube.Cube;
+import com.rubik.toll.back.rubik.cube.Face;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

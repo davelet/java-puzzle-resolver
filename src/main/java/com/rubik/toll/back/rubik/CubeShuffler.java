@@ -35,7 +35,7 @@ public class CubeShuffler {
     }
 
     public void rotateFace(Face face, TwistDirection direction) {
-        logger.info("旋转{}, 方向{}", face, direction);
+        logger.debug("旋转{}, 方向{}", face, direction);
         // 保存当前面的状态
         Color[][] currentFace = new Color[3][3];
         for (int i = 0; i < 3; i++) {

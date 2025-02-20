@@ -54,11 +54,10 @@ public class BottomCornerSolver extends LayerSolver {
                     throw new IllegalArgumentException("无效的底层角块位置");
                 row = 2 - row;
             }
-            logger.info("解决底层角块位置：{} {} {}\n{}", face, row, col, cube);
             // 旋转顶层，将角块对准目标位置
             alignCornerWithTarget(row, col);
 
-            logger.info("解决了底层角块位置：{} {} {}\n{}", face, row, col, cube);
+            logger.debug("解决了底层角块位置：{} {} {}\n{}", face, row, col, cube);
         }
     }
 

@@ -52,9 +52,7 @@ class CubeSolverTest {
         cubeShuffler.shuffle(20);
         // 执行测试
         cubeSolver.solve();
-//        MiddleLayerSolver bottomCrossSolver = new MiddleLayerSolver(cube);
-//        bottomCrossSolver.solve();
         // 验证结果
-//        assertTrue(cube.isSolved());
+        assertTrue(cube.isSolved());
     }
 }

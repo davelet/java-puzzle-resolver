@@ -16,21 +16,21 @@ public class TopLayerSolver extends LayerSolver {
 
     @Override
     protected void doSolve() {
-        // 第一步：形成顶层黄色十字
-        solveTopCross();
-
-        // 第二步：调整顶层边块位置
-        solveTopEdges();
-
-        // 第三步：调整顶层角块位置
-        solveTopCorners();
-
-        // 第四步：调整角块方向
-        orientTopCorners();
-
-        if (!isSolved()) {
-            throw new IllegalStateException("求解失败");
-        }
+//        // 第一步：形成顶层黄色十字
+//        solveTopCross();
+//
+//        // 第二步：调整顶层边块位置
+//        solveTopEdges();
+//
+//        // 第三步：调整顶层角块位置
+//        solveTopCorners();
+//
+//        // 第四步：调整角块方向
+//        orientTopCorners();
+//
+//        if (!isSolved()) {
+//            throw new IllegalStateException("求解失败");
+//        }
     }
 
     private void solveTopCross() {
@@ -141,7 +141,7 @@ public class TopLayerSolver extends LayerSolver {
     private boolean areTopEdgesAligned() {
         // 检查所有顶层边块是否对齐
         for (Face face : new Face[]{Face.FRONT, Face.RIGHT, Face.BACK, Face.LEFT}) {
-            if (cube.getColor(face, 0, 1) != cube.getColor(face, 1, 1)) {
+            if (cube.getColor(face, 0, 1) != face.getColor()) {
                 return false;
             }
         }
@@ -152,7 +152,7 @@ public class TopLayerSolver extends LayerSolver {
         // 计算已对齐的边块数量
         int count = 0;
         for (Face face : new Face[]{Face.FRONT, Face.RIGHT, Face.BACK, Face.LEFT}) {
-            if (cube.getColor(face, 0, 1) == cube.getColor(face, 1, 1)) {
+            if (cube.getColor(face, 0, 1) == face.getColor()) {
                 count++;
             }
         }
@@ -181,8 +181,8 @@ public class TopLayerSolver extends LayerSolver {
     private boolean areTopCornersAligned() {
         // 检查所有顶层角块是否在正确位置
         for (Face face : new Face[]{Face.FRONT, Face.RIGHT, Face.BACK, Face.LEFT}) {
-            if (cube.getColor(face, 0, 0) != cube.getColor(face, 1, 1) ||
-                    cube.getColor(face, 0, 2) != cube.getColor(face, 1, 1)) {
+            if (cube.getColor(face, 0, 0) != face.getColor() ||
+                    cube.getColor(face, 0, 2) != face.getColor()) {
                 return false;
             }
         }
@@ -192,8 +192,8 @@ public class TopLayerSolver extends LayerSolver {
     private boolean hasAlignedCorner() {
         // 检查是否有已对齐的角块
         for (Face face : new Face[]{Face.FRONT, Face.RIGHT, Face.BACK, Face.LEFT}) {
-            if (cube.getColor(face, 0, 0) == cube.getColor(face, 1, 1) &&
-                    cube.getColor(face, 0, 2) == cube.getColor(face, 1, 1)) {
+            if (cube.getColor(face, 0, 0) == face.getColor() &&
+                    cube.getColor(face, 0, 2) == face.getColor()) {
                 return true;
             }
         }
@@ -250,7 +250,7 @@ public class TopLayerSolver extends LayerSolver {
         // 检查四个侧面的顶层颜色是否与中心块匹配
         Face[] faces = {Face.FRONT, Face.RIGHT, Face.BACK, Face.LEFT};
         for (Face face : faces) {
-            Color centerColor = cube.getColor(face, 1, 1);
+            Color centerColor = face.getColor();
             if (cube.getColor(face, 0, 0) != centerColor ||
                     cube.getColor(face, 0, 1) != centerColor ||
                     cube.getColor(face, 0, 2) != centerColor) {

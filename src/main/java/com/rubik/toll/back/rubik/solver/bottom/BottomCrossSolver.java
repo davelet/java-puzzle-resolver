@@ -41,7 +41,7 @@ public class BottomCrossSolver extends LayerSolver {
             rotateFace(face, true);
             rotateFace(face, true);
         }
-        logger.info("处理底层和{}相交后：\n{}", face, cube);
+        logger.debug("处理底层和{}相交后：\n{}", face, cube);
     }
 
     private boolean isEdgeCorrect(Face face) {
@@ -223,26 +223,6 @@ public class BottomCrossSolver extends LayerSolver {
             return findEdgeInTop(currentFace);
         }
         return false;
-    }
-
-    private int[] getUpCenter(Face face) {
-        return switch (face) {
-            case FRONT -> new int[]{2, 1};
-            case RIGHT -> new int[]{1, 2};
-            case BACK -> new int[]{0, 1};
-            case LEFT -> new int[]{1, 0};
-            default -> throw new IllegalArgumentException("无效的面");
-        };
-    }
-
-    private int[] getDownCenter(Face face) {
-        return switch (face) {
-            case FRONT -> new int[]{0, 1};
-            case RIGHT -> new int[]{1, 2};
-            case BACK -> new int[]{2, 1};
-            case LEFT -> new int[]{1, 0};
-            default -> throw new IllegalArgumentException("无效的面");
-        };
     }
 
     protected boolean isSolved() {
